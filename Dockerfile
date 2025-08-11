@@ -1,20 +1,27 @@
-# Use Python base image
-FROM python:3.10-slim
+# ---------- Stage 1: Build & Test ----------
+FROM python:3.10-slim AS test
 
-# Set work directory inside container
 WORKDIR /app
 
-# Copy requirements file first for better caching
-COPY requirements.txt .
+# Install app dependencies + test dependencies
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt pytest
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application source code
 COPY . .
 
-# Expose app port
+# Run tests when explicitly executed
+CMD ["pytest", "test_api.py"]
+
+# ---------- Stage 2: Production ----------
+FROM python:3.10-slim AS prod
+
+WORKDIR /app
+
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
 EXPOSE 8000
 
-# Command to run the application
 CMD ["python", "app.py"]
