@@ -1,25 +1,20 @@
-# Use a lightweight Python base image
-FROM python:3.11-slim
+# Use Python base image
+FROM python:3.10-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
-
-# Set work directory
+# Set work directory inside container
 WORKDIR /app
 
-# Copy requirements first for better caching
+# Copy requirements file first for better caching
 COPY requirements.txt .
 
-# Install dependencies (including pytest)
-RUN pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir pytest
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application files
+# Copy application source code
 COPY . .
 
-# Expose the port your app runs on
+# Expose app port
 EXPOSE 8000
 
-# Run the application
+# Command to run the application
 CMD ["python", "app.py"]
